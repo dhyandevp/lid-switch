@@ -21,12 +21,14 @@ is_active() {
 
 do_on() {
     mkdir -p "$STATE_DIR"
+    chmod 700 "$STATE_DIR" 2>/dev/null || true
 
     # Only save previous lock setting if we aren't already active
     if ! is_active; then
         local current_lock
         current_lock=$(gsettings get "$SCREENSAVER_SCHEMA" lock-enabled 2>/dev/null || echo "true")
         echo "$current_lock" > "$LOCK_FILE"
+        chmod 600 "$LOCK_FILE" 2>/dev/null || true
     fi
 
     # Disable screensaver lock
@@ -61,14 +63,16 @@ do_off() {
     systemctl --user reset-failed "$UNIT_NAME" >/dev/null 2>&1 || true
 
     # Restore screensaver lock setting
+    local restore_lock="true"
     if [ -f "$LOCK_FILE" ]; then
         local saved_lock
         saved_lock=$(cat "$LOCK_FILE" 2>/dev/null || echo "true")
-        gsettings set "$SCREENSAVER_SCHEMA" lock-enabled "$saved_lock" 2>/dev/null || true
+        if [[ "$saved_lock" =~ ^(true|false)$ ]]; then
+            restore_lock="$saved_lock"
+        fi
         rm -f "$LOCK_FILE"
-    else
-        gsettings set "$SCREENSAVER_SCHEMA" lock-enabled true 2>/dev/null || true
     fi
+    gsettings set "$SCREENSAVER_SCHEMA" lock-enabled "$restore_lock" 2>/dev/null || true
 
     if has_gsettings_key "$SCREENSAVER_SCHEMA" "ubuntu-lock-on-suspend"; then
         gsettings set "$SCREENSAVER_SCHEMA" ubuntu-lock-on-suspend true 2>/dev/null || true

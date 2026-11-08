@@ -80,4 +80,22 @@ set +e
 set -e
 echo "PASS: Toggle successful"
 
+echo "=== Test 7: Security - Directory permissions & lock-file validation ==="
+"$BIN" on
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/lid-switch"
+DIR_PERMS=$(stat -c "%a" "$STATE_DIR")
+if [ "$DIR_PERMS" != "700" ]; then
+    echo "FAIL: Expected state directory permissions 700, got $DIR_PERMS"
+    exit 1
+fi
+# Inject corrupted value into saved-lock
+echo "malicious_string" > "$STATE_DIR/saved-lock"
+"$BIN" off
+LOCK_VAL=$(gsettings get org.gnome.desktop.screensaver lock-enabled)
+if [ "$LOCK_VAL" != "true" ]; then
+    echo "FAIL: Expected fallback lock-enabled to true on corrupted saved-lock, got $LOCK_VAL"
+    exit 1
+fi
+echo "PASS: Security checks passed"
+
 echo "ALL CLI TESTS PASSED!"

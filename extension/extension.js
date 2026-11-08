@@ -58,11 +58,13 @@ class LidIndicator extends SystemIndicator {
     }
 
     _restoreLockState() {
-        if (!this._screensaverSettings || !this._extSettings)
+        if (!this._screensaverSettings)
             return;
         try {
-            const savedLock = this._extSettings.get_boolean('saved-lock');
-            this._screensaverSettings.set_boolean('lock-enabled', savedLock);
+            let restoreVal = true;
+            if (this._extSettings)
+                restoreVal = this._extSettings.get_boolean('saved-lock');
+            this._screensaverSettings.set_boolean('lock-enabled', restoreVal);
         } catch {
             // ignore
         }
