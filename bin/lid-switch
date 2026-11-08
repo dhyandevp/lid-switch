@@ -15,7 +15,8 @@ has_gsettings_key() {
 }
 
 is_active() {
-    systemctl --user is-active -q "$UNIT_NAME" 2>/dev/null
+    systemctl --user is-active -q "$UNIT_NAME" 2>/dev/null || \
+    systemd-inhibit --list 2>/dev/null | grep -E "handle-lid-switch.*lid-switch|lid-switch.*handle-lid-switch" >/dev/null
 }
 
 do_on() {

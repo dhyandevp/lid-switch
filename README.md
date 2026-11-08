@@ -57,7 +57,19 @@ Most modern Linux distributions either lack a native Quick Settings toggle for l
 
 ## Installation
 
-Clone the repository and run the installer:
+### Method 1: Extension Bundle (GNOME 45 – 51+)
+
+Download and install the standalone extension bundle directly from GitHub Releases:
+
+```bash
+curl -LO https://github.com/dhyandevp/lid-switch/releases/download/v1.0.0/lid-switch@dhyandevp.shell-extension.zip
+gnome-extensions install --force lid-switch@dhyandevp.shell-extension.zip
+gnome-extensions enable lid-switch@dhyandevp
+```
+
+### Method 2: Full Repository (CLI Companion + Extension)
+
+Clone the repository and run the automated installer:
 
 ```bash
 git clone https://github.com/dhyandevp/lid-switch.git
@@ -66,6 +78,21 @@ cd lid-switch
 ```
 
 > **Note:** If this is your first GNOME extension installation, restart your GNOME session (log out and log back in, or press `Alt+F2` then `r` on X11) so GNOME Shell discovers the new extension.
+
+---
+
+## Publishing to GNOME Extensions (EGO)
+
+To build and publish to [extensions.gnome.org](https://extensions.gnome.org/upload/):
+
+1. **Package the bundle**:
+   ```bash
+   gnome-extensions pack extension/ --force
+   ```
+   This generates `lid-switch@dhyandevp.shell-extension.zip`.
+
+2. **Upload**:
+   Visit [extensions.gnome.org/upload/](https://extensions.gnome.org/upload/), log in with your GNOME account, and submit the generated `.shell-extension.zip`. The extension is 100% self-contained with zero external runtime dependencies, fully adhering to EGO review guidelines.
 
 ---
 
