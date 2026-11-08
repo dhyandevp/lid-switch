@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+# lid-switch: Toggle laptop lid-close behavior cleanly on GNOME / systemd systems
+set -euo pipefail
+
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/lid-switch"
+LOCK_FILE="$STATE_DIR/saved-lock"
+UNIT_NAME="lid-switch-inhibit"
+POWER_SCHEMA="org.gnome.settings-daemon.plugins.power"
+SCREENSAVER_SCHEMA="org.gnome.desktop.screensaver"
+
+has_gsettings_key() {
+    local schema="$1"
+    local key="$2"
+    gsettings list-keys "$schema" 2>/dev/null | grep -qx "$key"
+}
+
+is_active() {
+    systemctl --user is-active -q "$UNIT_NAME" 2>/dev/null
+}
+
+do_on() {
+    mkdir -p "$STATE_DIR"
+
+    # Only save previous lock setting if we aren't already active
+    if ! is_active; then
+        local current_lock
+        current_lock=$(gsettings get "$SCREENSAVER_SCHEMA" lock-enabled 2>/dev/null || echo "true")
+        echo "$current_lock" > "$LOCK_FILE"
+    fi
+
+    # Disable screensaver lock
+    gsettings set "$SCREENSAVER_SCHEMA" lock-enabled false 2>/dev/null || true
+    if has_gsettings_key "$SCREENSAVER_SCHEMA" "ubuntu-lock-on-suspend"; then
+        gsettings set "$SCREENSAVER_SCHEMA" ubuntu-lock-on-suspend false 2>/dev/null || true
+    fi
+
+    # Set power settings if schema supports lid keys (Ubuntu / older GNOME)
+    if has_gsettings_key "$POWER_SCHEMA" "lid-close-ac-action"; then
+        gsettings set "$POWER_SCHEMA" lid-close-ac-action nothing 2>/dev/null || true
+    fi
+    if has_gsettings_key "$POWER_SCHEMA" "lid-close-battery-action"; then
+        gsettings set "$POWER_SCHEMA" lid-close-battery-action nothing 2>/dev/null || true
+    fi
+
+    # Launch or ensure logind inhibitor via systemd user unit
+    if ! is_active; then
+        systemd-run --user --unit="$UNIT_NAME" \
+            systemd-inhibit --what=handle-lid-switch \
+                --who="lid-switch" \
+                --why="Laptop lid close configured to keep system running" \
+                sleep infinity >/dev/null 2>&1
+    fi
+
+    echo "lid-switch: active"
+}
+
+do_off() {
+    # Stop inhibitor unit
+    systemctl --user stop "$UNIT_NAME" >/dev/null 2>&1 || true
+    systemctl --user reset-failed "$UNIT_NAME" >/dev/null 2>&1 || true
+
+    # Restore screensaver lock setting
+    if [ -f "$LOCK_FILE" ]; then
+        local saved_lock
+        saved_lock=$(cat "$LOCK_FILE" 2>/dev/null || echo "true")
+        gsettings set "$SCREENSAVER_SCHEMA" lock-enabled "$saved_lock" 2>/dev/null || true
+        rm -f "$LOCK_FILE"
+    else
+        gsettings set "$SCREENSAVER_SCHEMA" lock-enabled true 2>/dev/null || true
+    fi
+
+    if has_gsettings_key "$SCREENSAVER_SCHEMA" "ubuntu-lock-on-suspend"; then
+        gsettings set "$SCREENSAVER_SCHEMA" ubuntu-lock-on-suspend true 2>/dev/null || true
+    fi
+
+    # Restore power settings if schema supports lid keys
+    if has_gsettings_key "$POWER_SCHEMA" "lid-close-ac-action"; then
+        gsettings set "$POWER_SCHEMA" lid-close-ac-action suspend 2>/dev/null || true
+    fi
+    if has_gsettings_key "$POWER_SCHEMA" "lid-close-battery-action"; then
+        gsettings set "$POWER_SCHEMA" lid-close-battery-action suspend 2>/dev/null || true
+    fi
+
+    echo "lid-switch: inactive"
+}
+
+do_status() {
+    if is_active; then
+        echo "active"
+        exit 0
+    else
+        echo "inactive"
+        exit 1
+    fi
+}
+
+do_toggle() {
+    if is_active; then
+        do_off
+    else
+        do_on
+    fi
+}
+
+case "${1:-}" in
+    on)
+        do_on
+        ;;
+    off)
+        do_off
+        ;;
+    toggle)
+        do_toggle
+        ;;
+    status)
+        do_status
+        ;;
+    *)
+        echo "Usage: lid-switch {on|off|toggle|status}" >&2
+        exit 2
+        ;;
+esac
