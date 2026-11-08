@@ -1,0 +1,8 @@
+{
+  "name": "Lid Switch",
+  "description": "Toggle laptop lid-close behavior between sleep and active",
+  "uuid": "lid-switch@dhyandevp",
+  "shell-version": ["51"],
+  "version": 1,
+  "url": "https://github.com/dhyandevp/lid-switch"
+}
