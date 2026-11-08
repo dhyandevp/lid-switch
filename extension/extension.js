@@ -39,6 +39,10 @@ class LidIndicator extends SystemIndicator {
 
         this.quickSettingsItems.push(this._toggle);
 
+        this._statusIcon = this._addIndicator();
+        this._statusIcon.icon_name = 'computer-symbolic';
+        this._statusIcon.visible = false;
+
         this._sync();
     }
 
@@ -159,6 +163,8 @@ class LidIndicator extends SystemIndicator {
     _updateUi(active) {
         this._toggle.checked = active;
         this._toggle.subtitle = active ? _('Active') : _('Sleep');
+        if (this._statusIcon)
+            this._statusIcon.visible = active;
     }
 
     _sync() {
@@ -193,6 +199,12 @@ class LidIndicator extends SystemIndicator {
     }
 
     cleanUp() {
+        if (this._statusIcon) {
+            this._statusIcon.visible = false;
+            this._statusIcon.destroy();
+            this._statusIcon = null;
+        }
+
         if (this._inhibitFd !== null) {
             try {
                 GLib.close(this._inhibitFd);
