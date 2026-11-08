@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.lid-switch" path="/org/gnome/shell/extensions/lid-switch/">
+    <key name="saved-lock" type="b">
+      <default>true</default>
+      <summary>Saved screensaver lock setting</summary>
+      <description>Previous value of screensaver lock-enabled before inhibition</description>
+    </key>
+  </schema>
+</schemalist>

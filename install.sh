@@ -25,9 +25,13 @@ if [[ ":$PATH:" != *":$USER_BIN:"* ]]; then
 fi
 
 # 2. Install GNOME Shell Extension
-mkdir -p "$USER_EXT"
+mkdir -p "$USER_EXT/schemas"
 cp "$EXT_SRC/metadata.json" "$USER_EXT/"
 cp "$EXT_SRC/extension.js" "$USER_EXT/"
+if [ -d "$EXT_SRC/schemas" ]; then
+    cp "$EXT_SRC/schemas/"*.xml "$USER_EXT/schemas/"
+    glib-compile-schemas "$USER_EXT/schemas" 2>/dev/null || true
+fi
 echo "✓ Installed GNOME Extension to $USER_EXT"
 
 # 3. Pre-enable extension in GSettings

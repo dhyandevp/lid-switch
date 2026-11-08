@@ -14,7 +14,13 @@ class LidIndicator extends SystemIndicator {
         super._init();
         this._extension = extension;
         this._inhibitFd = null;
-        this._savedLock = null;
+        this._toggleClickedId = null;
+
+        try {
+            this._extSettings = this._extension.getSettings();
+        } catch {
+            this._extSettings = null;
+        }
 
         const schemaSource = Gio.SettingsSchemaSource.get_default();
         if (schemaSource) {
@@ -33,58 +39,32 @@ class LidIndicator extends SystemIndicator {
 
         this.quickSettingsItems.push(this._toggle);
 
-        this._toggle.connect('clicked', () => {
+        this._toggleClickedId = this._toggle.connect('clicked', () => {
             this._onToggleClicked();
         });
 
         this._sync();
     }
 
-    _getStateDir() {
-        return GLib.build_filenamev([GLib.get_user_state_dir(), 'lid-switch']);
-    }
-
-    _getLockFilePath() {
-        return GLib.build_filenamev([this._getStateDir(), 'saved-lock']);
-    }
-
     _saveLockState() {
-        if (!this._screensaverSettings)
+        if (!this._screensaverSettings || !this._extSettings)
             return;
         try {
             const currentLock = this._screensaverSettings.get_boolean('lock-enabled');
-            this._savedLock = currentLock;
-            const dir = this._getStateDir();
-            GLib.mkdir_with_parents(dir, 0o700);
-            const path = this._getLockFilePath();
-            GLib.file_set_contents(path, currentLock ? 'true\n' : 'false\n');
-        } catch (e) {
-            console.error(`LidSwitch: failed to save lock state: ${e.message}`);
+            this._extSettings.set_boolean('saved-lock', currentLock);
+        } catch {
+            // ignore
         }
     }
 
     _restoreLockState() {
-        if (!this._screensaverSettings)
+        if (!this._screensaverSettings || !this._extSettings)
             return;
         try {
-            let restoreVal = true;
-            if (this._savedLock !== null) {
-                restoreVal = this._savedLock;
-            } else {
-                const path = this._getLockFilePath();
-                if (GLib.file_test(path, GLib.FileTest.EXISTS)) {
-                    const [, data] = GLib.file_get_contents(path);
-                    const content = new TextDecoder().decode(data).trim();
-                    restoreVal = content !== 'false';
-                }
-            }
-            this._screensaverSettings.set_boolean('lock-enabled', restoreVal);
-            this._savedLock = null;
-            const path = this._getLockFilePath();
-            if (GLib.file_test(path, GLib.FileTest.EXISTS))
-                GLib.unlink(path);
-        } catch (e) {
-            console.error(`LidSwitch: failed to restore lock state: ${e.message}`);
+            const savedLock = this._extSettings.get_boolean('saved-lock');
+            this._screensaverSettings.set_boolean('lock-enabled', savedLock);
+        } catch {
+            // ignore
         }
     }
 
@@ -97,8 +77,8 @@ class LidIndicator extends SystemIndicator {
                 this._powerSettings.set_string('lid-close-ac-action', action);
             if (keys.includes('lid-close-battery-action'))
                 this._powerSettings.set_string('lid-close-battery-action', action);
-        } catch (e) {
-            console.error(`LidSwitch: failed to set power action: ${e.message}`);
+        } catch {
+            // ignore
         }
     }
 
@@ -114,8 +94,8 @@ class LidIndicator extends SystemIndicator {
         if (this._screensaverSettings) {
             try {
                 this._screensaverSettings.set_boolean('lock-enabled', false);
-            } catch (e) {
-                console.error(`LidSwitch: failed to disable lock: ${e.message}`);
+            } catch {
+                // ignore
             }
         }
         this._setPowerAction('nothing');
@@ -142,8 +122,7 @@ class LidIndicator extends SystemIndicator {
                     const fds = fdList.steal_fds();
                     this._inhibitFd = fds[0];
                     this._updateUi(true);
-                } catch (e) {
-                    console.error(`LidSwitch: Inhibit call failed: ${e.message}`);
+                } catch {
                     this._restoreLockState();
                     this._setPowerAction('suspend');
                     this._updateUi(false);
@@ -156,8 +135,8 @@ class LidIndicator extends SystemIndicator {
         if (this._inhibitFd !== null) {
             try {
                 GLib.close(this._inhibitFd);
-            } catch (e) {
-                console.error(`LidSwitch: error closing fd: ${e.message}`);
+            } catch {
+                // ignore
             }
             this._inhibitFd = null;
         }
@@ -210,7 +189,7 @@ class LidIndicator extends SystemIndicator {
                         what.includes('handle-lid-switch') && who === 'lid-switch'
                     );
                     this._updateUi(active);
-                } catch (e) {
+                } catch {
                     this._updateUi(false);
                 }
             }
@@ -218,6 +197,11 @@ class LidIndicator extends SystemIndicator {
     }
 
     cleanUp() {
+        if (this._toggleClickedId) {
+            this._toggle.disconnect(this._toggleClickedId);
+            this._toggleClickedId = null;
+        }
+
         if (this._inhibitFd !== null) {
             try {
                 GLib.close(this._inhibitFd);
