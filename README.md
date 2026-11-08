@@ -9,6 +9,18 @@
 
 ---
 
+## Demo
+
+<p align="center">
+  <a href="https://github.com/dhyandevp/lid-switch/raw/main/assets/lid-switch-demo.mp4">
+    <img src="assets/lid-switch-demo.jpg" alt="Lid Switch Demo Video" width="850" />
+  </a>
+  <br />
+  <em>▶ Click the preview image above to watch the 1080p demonstration video (assets/lid-switch-demo.mp4)</em>
+</p>
+
+---
+
 ## Why Lid Switch?
 
 Most modern Linux distributions either lack a native Quick Settings toggle for laptop lid action or require root privileges, risky `/etc/systemd/logind.conf` modifications, or manual lock screen tweaks.
