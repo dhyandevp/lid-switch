@@ -39,10 +39,6 @@ class LidIndicator extends SystemIndicator {
 
         this.quickSettingsItems.push(this._toggle);
 
-        this._toggleClickedId = this._toggle.connect('clicked', () => {
-            this._onToggleClicked();
-        });
-
         this._sync();
     }
 
@@ -197,11 +193,6 @@ class LidIndicator extends SystemIndicator {
     }
 
     cleanUp() {
-        if (this._toggleClickedId) {
-            this._toggle.disconnect(this._toggleClickedId);
-            this._toggleClickedId = null;
-        }
-
         if (this._inhibitFd !== null) {
             try {
                 GLib.close(this._inhibitFd);
@@ -220,6 +211,14 @@ export default class LidSwitchExtension extends Extension {
         this._indicator = new LidIndicator(this);
         Main.panel.statusArea.quickSettings.addExternalIndicator(this._indicator);
 
+        this._toggleClickedId = this._indicator._toggle.connect(
+            'clicked',
+            () => {
+                if (this._indicator)
+                    this._indicator._onToggleClicked();
+            }
+        );
+
         this._menuSignal = Main.panel.statusArea.quickSettings.menu.connect(
             'open-state-changed',
             (menu, isOpen) => {
@@ -233,6 +232,12 @@ export default class LidSwitchExtension extends Extension {
         if (this._menuSignal) {
             Main.panel.statusArea.quickSettings.menu.disconnect(this._menuSignal);
             this._menuSignal = null;
+        }
+
+        if (this._toggleClickedId) {
+            if (this._indicator && this._indicator._toggle)
+                this._indicator._toggle.disconnect(this._toggleClickedId);
+            this._toggleClickedId = null;
         }
 
         if (this._indicator) {
