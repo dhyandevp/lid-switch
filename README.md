@@ -1,39 +1,149 @@
-# Lid Switch
+<div align="center">
 
-[![GNOME Shell 51+](https://img.shields.io/badge/GNOME-51%2B-blue?logo=gnome&logoColor=white)](https://gitlab.gnome.org/GNOME/gnome-shell)
-[![Platform Linux](https://img.shields.io/badge/Platform-Fedora%20%7C%20Ubuntu%20%7C%20Arch%20%7C%20Debian-informational?logo=linux&logoColor=white)](https://systemd.io/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![No Root Required](https://img.shields.io/badge/Privileges-User%20Space%20(No%20Root)-success)](#security--architecture)
+# 💻 Lid Switch
 
-> **Instant control over your laptop's lid-close behavior.** Toggle seamlessly between **Sleep** (suspend on close) and **Active** (stay awake with lid closed) right from GNOME Quick Settings or your terminal.
+### Instant control over laptop lid-close behavior in GNOME.
+
+Keep downloads, audio, compiling, and docked setups running when your laptop lid is closed.
+
+<br/>
+
+[![GNOME Extensions](https://img.shields.io/badge/Install%20on-GNOME%20Extensions-4a86cf?style=for-the-badge&logo=gnome&logoColor=white)](https://extensions.gnome.org/extension/11675/lid-switch/)
+[![GNOME Shell](https://img.shields.io/badge/GNOME%20Shell-45%20%7C%2046%20%7C%2047%20%7C%2051%2B-blue?style=for-the-badge&logo=gnome&logoColor=white)](https://gitlab.gnome.org/GNOME/gnome-shell)
+[![Linux Platform](https://img.shields.io/badge/Platform-Fedora%20%7C%20Ubuntu%20%7C%20Arch%20%7C%20Debian-informational?style=for-the-badge&logo=linux&logoColor=white)](https://systemd.io/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+[![Zero Root](https://img.shields.io/badge/Security-User%20Space%20(Zero%20Root)-success?style=for-the-badge)](#-security--architecture)
+
+<br/>
+
+<a href="https://extensions.gnome.org/extension/11675/lid-switch/">
+  <img src="https://img.shields.io/badge/⭐%20GET%20IT%20ON-GNOME%20EXTENSIONS%20(EGO)-4a86cf?style=for-the-badge&logo=gnome&logoColor=white&labelColor=1a202c" height="42" alt="Install from GNOME Extensions" />
+</a>
+
+<br/><br/>
+
+[![Lid Switch Banner](assets/gnome-store-screenshot.png)](https://extensions.gnome.org/extension/11675/lid-switch/)
+
+</div>
 
 ---
 
-## Demo
+## 🌟 Visual Showcase
+
+<div align="center">
+<table>
+  <tr>
+    <td width="52%" align="center">
+      <b>Native Quick Settings & Status Indicator</b><br/><br/>
+      <a href="https://extensions.gnome.org/extension/11675/lid-switch/">
+        <img src="assets/gnome-screenshot-clean.png" alt="Quick Settings Clean View" width="100%" />
+      </a>
+      <br/>
+      <em>One-click toggle with real-time status pill in top bar</em>
+    </td>
+    <td width="48%" align="center">
+      <b>GNOME Extension Manager Listing</b><br/><br/>
+      <a href="https://extensions.gnome.org/extension/11675/lid-switch/">
+        <img src="assets/extension-manager-preview.png" alt="GNOME Extension Manager Listing" width="100%" />
+      </a>
+      <br/>
+      <em>Verified and available on <a href="https://extensions.gnome.org/extension/11675/lid-switch/">extensions.gnome.org/extension/11675/lid-switch/</a></em>
+    </td>
+  </tr>
+</table>
+</div>
+
+### 🎬 Interactive Video Demo
 
 <p align="center">
   <a href="https://github.com/dhyandevp/lid-switch/raw/main/assets/lid-switch-demo.mp4">
     <img src="assets/lid-switch-demo.jpg" alt="Lid Switch Demo Video" width="850" />
   </a>
   <br />
-  <em>▶ Click the preview image above to watch the 1080p demonstration video (assets/lid-switch-demo.mp4)</em>
+  <em>▶ Click preview image above to watch 1080p demonstration video (assets/lid-switch-demo.mp4)</em>
 </p>
 
 ---
 
-## Why Lid Switch?
+## 💡 Why Lid Switch?
 
-Most modern Linux distributions either lack a native Quick Settings toggle for laptop lid action or require root privileges, risky `/etc/systemd/logind.conf` modifications, or manual lock screen tweaks.
+Most modern Linux laptops automatically suspend when the lid is closed. Disabling this usually requires editing `/etc/systemd/logind.conf` with `sudo`, managing fragile scripts, or remembering to manually turn off screen lock.
 
-**Lid Switch** provides a reliable, non-destructive, non-root mechanism:
-1. **One-Click Quick Settings Toggle**: Integrated natively into GNOME Shell 51 Quick Settings menu.
-2. **CLI Companion**: Full scripting, hotkey, and terminal control via `lid-switch`.
-3. **Smart Lock Preservation**: Automatically suppresses screensaver lock while active, and cleanly restores your original lock preference when toggled back to sleep.
-4. **100% User-Space**: Zero `sudo` requirements. Cannot corrupt system files or brick power configurations.
+**Lid Switch** delivers a clean, reliable, non-destructive solution:
+
+- 🔘 **Native Quick Settings Integration**: One click in the top-right system tray switches between **Active** and **Sleep**.
+- 📍 **Top Bar Indicator**: Clean icon in the panel status capsule tells you at a glance when lid suspension is disabled.
+- ⚡ **Pure D-Bus Logind Inhibitor**: Leverages `org.freedesktop.login1.Manager.Inhibit` directly. Zero latency, instant response.
+- 🛡️ **Smart Lock Preservation**: Suppresses screensaver lock while active so closing your lid doesn't interrupt presentations, external displays, or docked mode. Automatically restores your exact original lock preference when toggled back to sleep.
+- 🔒 **Zero Root Needed**: 100% user-space operation. Never modifies `/etc` or system configuration files.
 
 ---
 
-## How It Works
+## 🚀 Installation
+
+### Option 1: 1-Click Install via GNOME Extensions (Recommended)
+
+1. Open **[extensions.gnome.org/extension/11675/lid-switch/](https://extensions.gnome.org/extension/11675/lid-switch/)**
+2. Toggle the switch to **ON** and confirm **Install**
+3. Alternatively, search for **Lid Switch** in the **Extension Manager** desktop app and click **Install**
+
+---
+
+### Option 2: Full Installer (Extension + CLI Companion)
+
+Clone the repository and run the automated installer:
+
+```bash
+git clone https://github.com/dhyandevp/lid-switch.git
+cd lid-switch
+./install.sh
+```
+
+The installer:
+- Deploys `lid-switch` to `~/.local/bin/`
+- Installs the extension to `~/.local/share/gnome-shell/extensions/lid-switch@dhyandevp/`
+- Enables the extension in GNOME Shell
+
+> **Note:** If this is your first GNOME extension install, log out and log back in (or press `Alt+F2` then `r` on X11) so GNOME Shell discovers it.
+
+---
+
+### Option 3: Manual Extension ZIP Install
+
+```bash
+gnome-extensions install --force lid-switch@dhyandevp.shell-extension.zip
+gnome-extensions enable lid-switch@dhyandevp
+```
+
+---
+
+## 🖥️ Usage
+
+### 1. GNOME Quick Settings
+
+Click the system menu in the top-right corner of your desktop. Toggle **Lid Switch**:
+- **Sleep** (default): Normal laptop suspend when lid is shut.
+- **Active**: Laptop stays awake with lid closed (music, downloads, Docker, builds continue running).
+
+---
+
+### 2. Command Line Interface
+
+A standalone CLI companion is included for terminal use, scripts, and keybindings:
+
+```bash
+lid-switch on       # Keep running when lid is closed
+lid-switch off      # Normal laptop suspend on lid close
+lid-switch toggle   # Flip between active and sleep
+lid-switch status   # Output 'active' (exit 0) or 'inactive' (exit 1)
+```
+
+#### Custom Keyboard Shortcut:
+Bind `lid-switch toggle` in **GNOME Settings** → **Keyboard** → **Keyboard Shortcuts** → **Custom Shortcuts** to toggle lid behavior with a single keystroke.
+
+---
+
+## 🛠️ Security & Architecture
 
 ```
                      ┌─────────────────────────────┐
@@ -44,101 +154,38 @@ Most modern Linux distributions either lack a native Quick Settings toggle for l
                   ┌─────────────────┴─────────────────┐
                   ▼                                   ▼
         [ State: ACTIVE ]                   [ State: SLEEP ]
-  - Inhibits handle-lid-switch        - Terminates inhibitor unit
+  - Inhibits handle-lid-switch        - Terminates inhibitor
   - Disables screensaver lock         - Restores original lock setting
   - Sets GSettings power (fallback)   - Restores power suspend actions
 ```
 
-1. **Systemd Inhibitor Unit**: Dispatches `systemd-inhibit --what=handle-lid-switch` under a dynamic user service (`lid-switch-inhibit`). The kernel and logind are instructed to ignore lid-close events.
-2. **Screensaver Guard**: Inspects `org.gnome.desktop.screensaver lock-enabled`, saves the existing preference to user state, and disables lock while active so closing your lid doesn't interrupt presentation or dock mode.
-3. **Multi-Distro Power Compatibility**: Sets `lid-close-ac-action` and `lid-close-battery-action` when available (Ubuntu / earlier GNOME), while relying on logind inhibitors on Fedora / GNOME 51+.
+1. **Logind D-Bus Inhibit**: Acquires `handle-lid-switch` lock with `block` mode via systemd logind. The Linux kernel and display manager are cleanly informed to bypass lid-close suspend.
+2. **Safe Lock Handling**: Reads `org.gnome.desktop.screensaver lock-enabled`, saves existing preference to user state (`0700` / `0600` permissions), and restores it immediately upon deactivation.
+3. **Cross-Distro Compatibility**: Automatically checks for power schema keys before reading/writing, preventing errors across diverse Linux distros.
 
 ---
 
-## Installation
-
-### Method 1: Extension Bundle (GNOME 45 – 51+)
-
-Download and install the standalone extension bundle directly from GitHub Releases:
-
-```bash
-curl -LO https://github.com/dhyandevp/lid-switch/releases/download/v1.0.0/lid-switch@dhyandevp.shell-extension.zip
-gnome-extensions install --force lid-switch@dhyandevp.shell-extension.zip
-gnome-extensions enable lid-switch@dhyandevp
-```
-
-### Method 2: Full Repository (CLI Companion + Extension)
-
-Clone the repository and run the automated installer:
-
-```bash
-git clone https://github.com/dhyandevp/lid-switch.git
-cd lid-switch
-./install.sh
-```
-
-> **Note:** If this is your first GNOME extension installation, restart your GNOME session (log out and log back in, or press `Alt+F2` then `r` on X11) so GNOME Shell discovers the new extension.
-
----
-
-## Publishing to GNOME Extensions (EGO)
-
-To build and publish to [extensions.gnome.org](https://extensions.gnome.org/upload/):
-
-1. **Package the bundle**:
-   ```bash
-   gnome-extensions pack extension/ --force
-   ```
-   This generates `lid-switch@dhyandevp.shell-extension.zip`.
-
-2. **Upload**:
-   Visit [extensions.gnome.org/upload/](https://extensions.gnome.org/upload/), log in with your GNOME account, and submit the generated `.shell-extension.zip`. The extension is 100% self-contained with zero external runtime dependencies, fully adhering to EGO review guidelines.
-
----
-
-## Usage
-
-### 1. GNOME Quick Settings
-Click the system tray in the top-right corner of your desktop. Toggle **Lid Switch** between:
-- **Sleep** (normal suspend on lid close)
-- **Active** (keeps running with lid closed)
-
-### 2. Command Line Interface
-
-```bash
-lid-switch on       # Keep running when lid is closed
-lid-switch off      # Normal laptop suspend on lid close
-lid-switch toggle   # Flip current state
-lid-switch status   # Output 'active' (exit 0) or 'inactive' (exit 1)
-```
-
-Useful for keyboard shortcuts or custom scripts:
-```bash
-# Example: Bind to a keybinding in GNOME Settings -> Keyboard -> Custom Shortcuts
-lid-switch toggle
-```
-
----
-
-## Compatibility
+## 📋 Compatibility Matrix
 
 | Distribution / Desktop | Version | Status |
 |------------------------|---------|--------|
-| **Fedora**             | 40, 41, 42, 43, 45 (GNOME 51+) | Verified (Native) |
-| **Ubuntu**             | 22.04 LTS, 24.04 LTS+ | Verified |
+| **Fedora**             | 40, 41, 42, 43, 45+ (GNOME 51+) | Verified (Native) |
+| **Ubuntu**             | 22.04 LTS, 24.04 LTS, 24.10+ | Verified |
 | **Arch Linux**         | Rolling (systemd) | Verified |
 | **Debian**             | 12 (Bookworm)+ | Verified |
+| **GNOME Shell**        | 45, 46, 47, 51+ | Verified |
 
 ---
 
-## Project Structure
+## 📂 Project Structure
 
 ```
 .
+├── assets/               # Showcase screenshots & demo video
 ├── bin/
 │   └── lid-switch        # Executable CLI companion
 ├── extension/
-│   ├── metadata.json     # GNOME Shell extension metadata
+│   ├── metadata.json     # GNOME Shell extension metadata (EGO v6)
 │   └── extension.js      # Quick Settings SystemIndicator & QuickToggle
 ├── tests/
 │   └── test_cli.sh       # Automated regression test suite
@@ -150,9 +197,9 @@ lid-switch toggle
 
 ---
 
-## Testing
+## 🧪 Testing
 
-Run the automated test suite locally:
+Run automated CLI and regression tests:
 
 ```bash
 ./tests/test_cli.sh
@@ -160,16 +207,18 @@ Run the automated test suite locally:
 
 ---
 
-## Uninstallation
+## 🗑️ Uninstallation
 
-To completely remove the extension and CLI companion:
+To cleanly remove both extension and CLI helper:
 
 ```bash
 ./uninstall.sh
 ```
 
+Restores all screensaver and power preferences to system defaults and removes installed files.
+
 ---
 
-## License
+## 📄 License
 
 MIT © [dhyandevp](https://github.com/dhyandevp)

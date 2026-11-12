@@ -2,8 +2,7 @@
   "name": "Lid Switch",
   "description": "Toggle laptop lid-close behavior between sleep and active",
   "uuid": "lid-switch@dhyandevp",
-  "shell-version": ["45", "46", "47", "48", "49", "50", "51"],
-  "settings-schema": "org.gnome.shell.extensions.lid-switch",
-  "version": 5,
+  "shell-version": ["45", "46", "47", "51"],
+  "version": 6,
   "url": "https://github.com/dhyandevp/lid-switch"
 }
